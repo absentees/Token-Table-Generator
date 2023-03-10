@@ -3,7 +3,7 @@ interface ColourCell {
   colourRole: string;
   colourState: string;
   // colour value is an array
-  colourValue: Paint[];  
+  colourValue: Paint[];
 }
 
 // Create an empty object to store the colour table that stores ColourCell objects
@@ -27,75 +27,196 @@ async function main(): Promise<void> {
 
   // Loop through each color style and create a rectangle with that fill
   for (let style of colorStyles) {
-      
+
     // If there are no slashes in the style, skip it
     if (style.name.indexOf("/") === -1) {
       continue;
     }
-   
-    console.log("Create stuff for style: " + style.name);
 
     // First part of the name before the slash is the theme name, we don't need it - Light/Surface/Success/Secondary
     // Second part of the name before the slash is the colour role - Light/Surface/Success/Secondary
     let colourRole = style.name.split("/")[1];
 
-    // Third and fourth part of the name before the slash is the colour state - Light/Surface/Success/Secondary
-    // e.g. SuccessSecondary
-    // If the third split is missing leave it blank
-    let colourState = style.name.split("/")[2] || "" + style.name.split("/")[3] || "";
-    // console log the state and role
-    console.log(colourRole, colourState);
-    
+    // Use split to join all the parts after the first slash together - Light/Surface/Success/Secondary
+    // Remove all spaces from the string - LightSurfaceSuccessSecondary
+    let colourState = style.name.split("/").slice(2).join(" - ");
+
     // Check if the colour role is in the colour table
-    if (colourTable[colourRole] === undefined || colourTable[colourRole][colourState] === undefined) {
-      // If not, create a new object for the colour role
-      colourTable[colourRole] = {};
+    // if (colourTable[colourRole] === undefined || colourTable[colourRole][colourState] === undefined) {
+    // If not, create a new object for the colour role
+    // colourTable[colourRole] = {};
 
-      // Create a new colour cell object
-      let colourCell: ColourCell = {
-        colourRole: colourRole,
-        colourState: colourState,
-        colourValue: [style.paints[0]]
-      };
-
-      // Add the colour cell object to the colour table
-      colourTable[colourRole][colourState] = colourCell;
+    if (colourTable[colourRole] === undefined) {
+      colourTable[colourRole] = {}
     }
 
-    // Create a swatch frame
-    let swatchFrame = figma.createFrame();
-    swatchFrame.name = style.name;
-    swatchFrame.layoutMode = "VERTICAL";
-    swatchFrame.itemSpacing = 8;
-    // Align the swatch frame to the center
-    swatchFrame.counterAxisSizingMode = "AUTO";
 
-    // Create a new rectangle
-    let rect = figma.createRectangle();
-    rect.resize(64, 64);
-    // Set the rectangle fill to the color style
-    rect.fills = [style.paints[0]];
+    // Create a new colour cell object
+    let colourCell: ColourCell = {
+      colourRole: colourRole,
+      colourState: colourState,
+      colourValue: [style.paints[0]]
+    };
 
-    // Add the rectangle to the frame
-    swatchFrame.appendChild(rect);
+    // Add the colour cell object to the colour table
+    colourTable[colourRole][colourState] = colourCell;
+    // }
 
-    // Create a text label with the name of the color style
-    // Create a text label with the name and value of the color style
-    let label = figma.createText();
-    label.characters = style.name;
+    // // Create a row of text labels with the names of all the colour states
+    // let rowLabel = figma.createText();
+    // rowLabel.characters = colourState;
+    // rowLabel.fontSize = 12;
+    // rowLabel.textAlignHorizontal = "CENTER";
+    // rowLabel.textAlignVertical = "TOP";
+    // rowLabel.resize(64, 32);
+    // swatches.appendChild(rowLabel);
 
-    // Add some formatting to the text label
-    label.fontSize = 12;
-    label.textAlignHorizontal = "CENTER";
-    label.textAlignVertical = "TOP";
-    label.resize(64, 32);
+    // // Create a swatch frame
+    // let swatchFrame = figma.createFrame();
+    // swatchFrame.name = style.name;
+    // swatchFrame.layoutMode = "VERTICAL";
+    // swatchFrame.itemSpacing = 8;
+    // // Align the swatch frame to the center
+    // swatchFrame.counterAxisSizingMode = "AUTO";
 
-    // Add the text label below the rectangle
-    swatchFrame.appendChild(label);
+    // // Create a new rectangle
+    // let rect = figma.createRectangle();
+    // rect.resize(64, 64);
+    // // Set the rectangle fill to the color style
+    // rect.fills = [style.paints[0]];
 
-    // Add the swatch frame to the swatches frame
-    swatches.appendChild(swatchFrame);
+    // // Add the rectangle to the frame
+    // swatchFrame.appendChild(rect);
+
+    // // Create a text label with the name of the color style
+    // // Create a text label with the name and value of the color style
+    // let label = figma.createText();
+    // label.characters = style.name;
+
+    // // Add some formatting to the text label
+    // label.fontSize = 12;
+    // label.textAlignHorizontal = "CENTER";
+    // label.textAlignVertical = "TOP";
+    // label.resize(64, 32);
+
+    // // Add the text label below the rectangle
+    // swatchFrame.appendChild(label);
+
+    // // Add the swatch frame to the swatches frame
+    // swatches.appendChild(swatchFrame);
   }
+
+  /**
+   * Create the column header of labels
+   */
+  let headerColumn = figma.createFrame();
+  headerColumn.name = "Column Header";
+  headerColumn.layoutMode = "VERTICAL";
+  headerColumn.itemSpacing = 8;
+  headerColumn.paddingLeft = 8;
+  headerColumn.paddingRight = 8;
+  headerColumn.paddingTop = 40;
+  headerColumn.paddingBottom = 8;
+  headerColumn.counterAxisSizingMode = "AUTO";
+  swatches.appendChild(headerColumn);
+
+  // Loop through the colour table and create a column of text labels with the names of all the colour states
+  for (let colourRole in colourTable) {
+    // Create a column of text labels with the names of all the colour states
+    let columnLabel = figma.createText();
+    columnLabel.characters = colourRole;
+    columnLabel.fontSize = 16;
+    columnLabel.textAlignHorizontal = "CENTER";
+    columnLabel.textAlignVertical = "TOP";
+    columnLabel.resize(100, 64);
+
+    // Add the label to the header column
+    headerColumn.appendChild(columnLabel);
+  }
+
+  /**
+   * Create another column for each colour state, 
+   * but the first cell is just the label
+   */
+  for (let colourRole in colourTable) {
+    for (let colourState in colourTable[colourRole]) {
+      // If the first time the colour role found, create a column and a label
+      if (!swatches.findOne(n => n.name === colourTable[colourRole][colourState].colourState)) {
+        // Create the column for the colour role
+        let col = figma.createFrame();
+        col.name = colourTable[colourRole][colourState].colourState;
+        col.layoutMode = "VERTICAL";
+        col.itemSpacing = 8;
+        col.paddingLeft = 8;
+        col.paddingRight = 8;
+        col.paddingTop = 8;
+        col.paddingBottom = 8;
+        col.counterAxisSizingMode = "AUTO";
+        swatches.appendChild(col);
+
+        // Create the column heading
+        let columnLabel = figma.createText();
+        columnLabel.characters = colourState;
+        columnLabel.fontSize = 16;
+        columnLabel.textAlignHorizontal = "CENTER";
+        columnLabel.textAlignVertical = "TOP";
+
+        // Add the label to the header row
+        col.appendChild(columnLabel);
+      }
+    }
+  }
+
+
+  for (let col in swatches.children) {
+    for (let colourRole in colourTable) {
+      let swatchFrame = figma.createFrame();
+      swatchFrame.name = "swatch";
+      swatchFrame.layoutMode = "VERTICAL";
+      swatchFrame.itemSpacing = 8;
+      // Align the swatch frame to the center
+      swatchFrame.counterAxisSizingMode = "AUTO";
+
+
+      // Create a new rectangle
+      let rect = figma.createRectangle();
+      rect.name = `${colourRole} - ${swatches.children[col].name}`;
+      rect.resize(64, 64);
+      // Set the rectangle fill to a grey colour
+      // rect.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+      if(colourTable[colourRole][swatches.children[col].name]) rect.fills = colourTable[colourRole][swatches.children[col].name].colourValue;
+
+      swatchFrame.appendChild(rect);
+
+      swatches.children[col].appendChild(swatchFrame);
+    }
+  }
+
+  // for(let colourRole in colourTable) {
+  //   for(let colourState in colourTable[colourRole]){
+  //     // // For each colour state, add the swatch or put in a blank
+  //     // // Create a swatch frame
+  //     let swatchFrame = figma.createFrame();
+  //     swatchFrame.name = colourRole;
+  //     swatchFrame.layoutMode = "VERTICAL";
+  //     swatchFrame.itemSpacing = 8;
+  //     // Align the swatch frame to the center
+  //     swatchFrame.counterAxisSizingMode = "AUTO";
+
+  //     // // Create a new rectangle
+  //     // let rect = figma.createRectangle();
+  //     // rect.resize(64, 64);
+  //     // // Set the rectangle fill to the color style
+  //     // rect.fills = colourTable[colourState][colourRole].colourValue;
+
+  //     // swatchFrame.appendChild(rect);
+
+  //     // // Not the first time the label 
+  //     // // col.appendChild(swatchFrame);
+  //   }
+  // }
+
+
 
   // Final colour table console log
   console.log("Final colour table");
@@ -107,7 +228,7 @@ async function main(): Promise<void> {
   // Center the frame on the canvas
   swatches.x =
     (figma.viewport.center.x - swatches.width / 2);
-    swatches.y =
+  swatches.y =
     (figma.viewport.center.y - swatches.height / 2);
 }
 
