@@ -1,5 +1,5 @@
 {
-  "name": "Token-Table-Generator",
+  "name": "figma-token-table-generator",
   "version": "1.0.0",
   "description": "Your Figma Plugin",
   "main": "code.js",
