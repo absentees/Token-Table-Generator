@@ -41,15 +41,9 @@ async function main(): Promise<void> {
     // Remove all spaces from the string - LightSurfaceSuccessSecondary
     let colourState = style.name.split("/").slice(2).join(" - ");
 
-    // Check if the colour role is in the colour table
-    // if (colourTable[colourRole] === undefined || colourTable[colourRole][colourState] === undefined) {
-    // If not, create a new object for the colour role
-    // colourTable[colourRole] = {};
-
     if (colourTable[colourRole] === undefined) {
       colourTable[colourRole] = {}
     }
-
 
     // Create a new colour cell object
     let colourCell: ColourCell = {
@@ -62,48 +56,6 @@ async function main(): Promise<void> {
     colourTable[colourRole][colourState] = colourCell;
     // }
 
-    // // Create a row of text labels with the names of all the colour states
-    // let rowLabel = figma.createText();
-    // rowLabel.characters = colourState;
-    // rowLabel.fontSize = 12;
-    // rowLabel.textAlignHorizontal = "CENTER";
-    // rowLabel.textAlignVertical = "TOP";
-    // rowLabel.resize(64, 32);
-    // swatches.appendChild(rowLabel);
-
-    // // Create a swatch frame
-    // let swatchFrame = figma.createFrame();
-    // swatchFrame.name = style.name;
-    // swatchFrame.layoutMode = "VERTICAL";
-    // swatchFrame.itemSpacing = 8;
-    // // Align the swatch frame to the center
-    // swatchFrame.counterAxisSizingMode = "AUTO";
-
-    // // Create a new rectangle
-    // let rect = figma.createRectangle();
-    // rect.resize(64, 64);
-    // // Set the rectangle fill to the color style
-    // rect.fills = [style.paints[0]];
-
-    // // Add the rectangle to the frame
-    // swatchFrame.appendChild(rect);
-
-    // // Create a text label with the name of the color style
-    // // Create a text label with the name and value of the color style
-    // let label = figma.createText();
-    // label.characters = style.name;
-
-    // // Add some formatting to the text label
-    // label.fontSize = 12;
-    // label.textAlignHorizontal = "CENTER";
-    // label.textAlignVertical = "TOP";
-    // label.resize(64, 32);
-
-    // // Add the text label below the rectangle
-    // swatchFrame.appendChild(label);
-
-    // // Add the swatch frame to the swatches frame
-    // swatches.appendChild(swatchFrame);
   }
 
   /**
@@ -140,8 +92,10 @@ async function main(): Promise<void> {
    */
   for (let colourRole in colourTable) {
     for (let colourState in colourTable[colourRole]) {
+
       // If the first time the colour role found, create a column and a label
       if (!swatches.findOne(n => n.name === colourTable[colourRole][colourState].colourState)) {
+
         // Create the column for the colour role
         let col = figma.createFrame();
         col.name = colourTable[colourRole][colourState].colourState;
@@ -167,7 +121,6 @@ async function main(): Promise<void> {
     }
   }
 
-
   for (let col in swatches.children) {
     for (let colourRole in colourTable) {
       let swatchFrame = figma.createFrame();
@@ -191,32 +144,6 @@ async function main(): Promise<void> {
       swatches.children[col].appendChild(swatchFrame);
     }
   }
-
-  // for(let colourRole in colourTable) {
-  //   for(let colourState in colourTable[colourRole]){
-  //     // // For each colour state, add the swatch or put in a blank
-  //     // // Create a swatch frame
-  //     let swatchFrame = figma.createFrame();
-  //     swatchFrame.name = colourRole;
-  //     swatchFrame.layoutMode = "VERTICAL";
-  //     swatchFrame.itemSpacing = 8;
-  //     // Align the swatch frame to the center
-  //     swatchFrame.counterAxisSizingMode = "AUTO";
-
-  //     // // Create a new rectangle
-  //     // let rect = figma.createRectangle();
-  //     // rect.resize(64, 64);
-  //     // // Set the rectangle fill to the color style
-  //     // rect.fills = colourTable[colourState][colourRole].colourValue;
-
-  //     // swatchFrame.appendChild(rect);
-
-  //     // // Not the first time the label 
-  //     // // col.appendChild(swatchFrame);
-  //   }
-  // }
-
-
 
   // Final colour table console log
   console.log("Final colour table");

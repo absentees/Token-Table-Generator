@@ -1,6 +1,6 @@
 # Figma token table generator
 
-Based on the format `<Light/Dark>/<Colour Role>/<Colour State>/<Modifier>` this plugin will generate a labelled table of all the swatches.
+Based on the format `<Light/Dark>/<Colour Role>/<Colour State>/<Modifier>`  this plugin will generate a labelled table of all the swatches.
 
 It's handy to visualise what tokens you have, which are missing and which are possibly misaligned.
 
