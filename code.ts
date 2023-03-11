@@ -1,13 +1,14 @@
-// Create a colour cell object that contains a string for the colour role, a string for the colour state and a string for the colour value
-interface ColourCell {
-  colourRole: string;
-  colourState: string;
-  // colour value is an array
-  colourValue: Paint[];
+// Create a color cell object that contains a string for the color role, a string for the color state and a string for the color value
+interface colorCell {
+  fillStyleId: string;
+  colorRole: string;
+  colorState: string;
+  // color value is an array
+  colorValue: Paint[];
 }
 
-// Create an empty object to store the colour table that stores ColourCell objects
-let colourTable: { [key: string]: { [key: string]: ColourCell } } = {};
+// Create an empty object to store the color table that stores colorCell objects
+let colorTable: { [key: string]: { [key: string]: colorCell } } = {};
 
 async function main(): Promise<void> {
   let colorStyles = figma.getLocalPaintStyles();
@@ -34,26 +35,27 @@ async function main(): Promise<void> {
     }
 
     // First part of the name before the slash is the theme name, we don't need it - Light/Surface/Success/Secondary
-    // Second part of the name before the slash is the colour role - Light/Surface/Success/Secondary
-    let colourRole = style.name.split("/")[1];
+    // Second part of the name before the slash is the color role - Light/Surface/Success/Secondary
+    let colorRole = style.name.split("/")[1];
 
     // Use split to join all the parts after the first slash together - Light/Surface/Success/Secondary
     // Remove all spaces from the string - LightSurfaceSuccessSecondary
-    let colourState = style.name.split("/").slice(2).join(" - ");
+    let colorState = style.name.split("/").slice(2).join(" - ");
 
-    if (colourTable[colourRole] === undefined) {
-      colourTable[colourRole] = {}
+    if (colorTable[colorRole] === undefined) {
+      colorTable[colorRole] = {}
     }
 
-    // Create a new colour cell object
-    let colourCell: ColourCell = {
-      colourRole: colourRole,
-      colourState: colourState,
-      colourValue: [style.paints[0]]
+    // Create a new color cell object
+    let colorCell: colorCell = {
+      fillStyleId: style.id,
+      colorRole: colorRole,
+      colorState: colorState,
+      colorValue: [style.paints[0]]
     };
 
-    // Add the colour cell object to the colour table
-    colourTable[colourRole][colourState] = colourCell;
+    // Add the color cell object to the color table
+    colorTable[colorRole][colorState] = colorCell;
     // }
 
   }
@@ -72,11 +74,11 @@ async function main(): Promise<void> {
   headerColumn.counterAxisSizingMode = "AUTO";
   swatches.appendChild(headerColumn);
 
-  // Loop through the colour table and create a column of text labels with the names of all the colour states
-  for (let colourRole in colourTable) {
-    // Create a column of text labels with the names of all the colour states
+  // Loop through the color table and create a column of text labels with the names of all the color states
+  for (let colorRole in colorTable) {
+    // Create a column of text labels with the names of all the color states
     let columnLabel = figma.createText();
-    columnLabel.characters = colourRole;
+    columnLabel.characters = colorRole;
     columnLabel.fontSize = 16;
     columnLabel.textAlignHorizontal = "CENTER";
     columnLabel.textAlignVertical = "TOP";
@@ -87,18 +89,18 @@ async function main(): Promise<void> {
   }
 
   /**
-   * Create another column for each colour state, 
+   * Create another column for each color state, 
    * but the first cell is just the label
    */
-  for (let colourRole in colourTable) {
-    for (let colourState in colourTable[colourRole]) {
+  for (let colorRole in colorTable) {
+    for (let colorState in colorTable[colorRole]) {
 
-      // If the first time the colour role found, create a column and a label
-      if (!swatches.findOne(n => n.name === colourTable[colourRole][colourState].colourState)) {
+      // If the first time the color role found, create a column and a label
+      if (!swatches.findOne(n => n.name === colorTable[colorRole][colorState].colorState)) {
 
-        // Create the column for the colour role
+        // Create the column for the color role
         let col = figma.createFrame();
-        col.name = colourTable[colourRole][colourState].colourState;
+        col.name = colorTable[colorRole][colorState].colorState;
         col.layoutMode = "VERTICAL";
         col.itemSpacing = 8;
         col.paddingLeft = 8;
@@ -110,7 +112,7 @@ async function main(): Promise<void> {
 
         // Create the column heading
         let columnLabel = figma.createText();
-        columnLabel.characters = colourState;
+        columnLabel.characters = colorState;
         columnLabel.fontSize = 16;
         columnLabel.textAlignHorizontal = "CENTER";
         columnLabel.textAlignVertical = "TOP";
@@ -122,7 +124,7 @@ async function main(): Promise<void> {
   }
 
   for (let col in swatches.children) {
-    for (let colourRole in colourTable) {
+    for (let colorRole in colorTable) {
       let swatchFrame = figma.createFrame();
       swatchFrame.name = "swatch";
       swatchFrame.layoutMode = "VERTICAL";
@@ -133,11 +135,11 @@ async function main(): Promise<void> {
 
       // Create a new rectangle
       let rect = figma.createRectangle();
-      rect.name = `${colourRole} - ${swatches.children[col].name}`;
+      rect.name = `${colorRole} - ${swatches.children[col].name}`;
       rect.resize(64, 64);
-      // Set the rectangle fill to a grey colour
+      // Set the rectangle fill to a grey color
       // rect.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
-      if(colourTable[colourRole][swatches.children[col].name]) rect.fills = colourTable[colourRole][swatches.children[col].name].colourValue;
+      if(colorTable[colorRole][swatches.children[col].name]) rect.fills = colorTable[colorRole][swatches.children[col].name].colorValue;
 
       swatchFrame.appendChild(rect);
 
@@ -145,9 +147,9 @@ async function main(): Promise<void> {
     }
   }
 
-  // Final colour table console log
-  console.log("Final colour table");
-  console.log(colourTable);
+  // Final color table console log
+  console.log("Final color table");
+  console.log(colorTable);
 
   // Resize and center the frame on the canvas
   swatches.resizeWithoutConstraints(500, 100);
