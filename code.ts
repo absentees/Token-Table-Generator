@@ -139,7 +139,7 @@ async function main(): Promise<void> {
       rect.resize(64, 64);
       // Set the rectangle fill to a grey color
       // rect.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
-      if(colorTable[colorRole][swatches.children[col].name]) rect.fills = colorTable[colorRole][swatches.children[col].name].colorValue;
+      if(colorTable[colorRole][swatches.children[col].name]) rect.fillStyleId = colorTable[colorRole][swatches.children[col].name].fillStyleId;
 
       swatchFrame.appendChild(rect);
 
