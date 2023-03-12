@@ -137,9 +137,15 @@ async function main(): Promise<void> {
       let rect = figma.createRectangle();
       rect.name = `${colorRole} - ${swatches.children[col].name}`;
       rect.resize(64, 64);
-      // Set the rectangle fill to a grey color
-      // rect.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
-      if(colorTable[colorRole][swatches.children[col].name]) rect.fillStyleId = colorTable[colorRole][swatches.children[col].name].fillStyleId;
+      
+      // Set the rectangle colour to the colour style, if no colour found make it empty
+      if(colorTable[colorRole][swatches.children[col].name]) {
+        // Give each rectangle a 1px black stroke
+        rect.strokes = [{type: "SOLID", color: {r: 0, g: 0, b: 0}}];
+        rect.fillStyleId = colorTable[colorRole][swatches.children[col].name].fillStyleId;
+      } else {
+        rect.fills = [];
+      }
 
       swatchFrame.appendChild(rect);
 
