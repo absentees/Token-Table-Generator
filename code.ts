@@ -71,16 +71,29 @@ function CreateColorSwatches(swatches: FrameNode) {
       rect.name = `${colorRole} - ${swatches.children[col].name}`;
       rect.resize(64, 64);
 
+      // Create a new label for the colour style
+      let swatchLabel = figma.createText();
+      swatchLabel.fontSize = 8;
+      swatchLabel.textAlignHorizontal = "LEFT";
+      swatchLabel.textAlignVertical = "TOP";
+      swatchLabel.resize(100, 100);
+      
+      
       // Set the rectangle colour to the colour style, if no colour found make it empty
       if (colorTable[colorRole][swatches.children[col].name]) {
         // Give each rectangle a 1px black stroke
         rect.strokes = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
         rect.fillStyleId = colorTable[colorRole][swatches.children[col].name].fillStyleId;
+        swatchLabel.characters = `${colorRole} - ${swatches.children[col].name}`;
+
       } else {
         rect.fills = [];
+        swatchLabel.characters = "No colour";
+        swatchLabel.opacity = 0.2;
       }
 
       swatchFrame.appendChild(rect);
+      swatchFrame.appendChild(swatchLabel);
 
       swatches.children[col].appendChild(swatchFrame);
     }
